@@ -1,7 +1,6 @@
 /*
  *  LiteMaps is a Google Maps Plugin for jQuery
- *  Version   : 0.1-alpha1
- *  Date      : June 12, 2011
+ *  Version   : 0.1-alpha1-dev
  *  Licence   : GPL v3 : http://www.gnu.org/licenses/gpl.html  
  *  Author    : Sergio Jovani
  *  Contact   : lesergi@gmail.com
@@ -72,7 +71,7 @@
          zoom: 'auto',
          center: 'auto',
          type: 'roadmap',
-         markers: {},
+         markers: new Array(),
          height: '600px',
          width: '800px',
        };
@@ -100,7 +99,7 @@
        
        // Zoom
        litemaps.options._zoom = litemaps.options.zoom;
-       litemaps.options.zoom = 10;
+       litemaps.options.zoom = 15;
        
        // Center
        litemaps.options._center = litemaps.options.center;
@@ -134,14 +133,12 @@
       * Add markers to the map
       */
      setMarkers: function(e) {
-       if (litemaps.options.markers) {
+       if (litemaps.options.markers.length > 0) {
          var mapid = e.data('mapid');
          var markers = litemaps.options.markers;
          litemaps.markers = {};
-         litemaps.markers[mapid] = {};
-         $.each(markers, function(marker_id, marker){  
-           litemaps.markers[mapid][marker_id] = {};
-           
+         litemaps.markers[mapid] = new Array();
+         $.each(markers, function(marker_id, marker){ 
            if (marker.lat && marker.lng) {
              litemaps.addMarker(e, marker.lat, marker.lng, marker.content);
            }
@@ -171,24 +168,25 @@
      addMarker: function(e, marker_id, lat, lng, content) {
        var mapid = e.data('mapid');
        var marker = litemaps.options.markers[marker_id];
-       litemaps.markers[mapid][marker_id] = {};
+       litemaps.markers[mapid].push({});
+       var i = litemaps.markers[mapid].length - 1;
        
-       litemaps.markers[mapid][marker_id].marker = new google.maps.Marker({
+       litemaps.markers[mapid][i].marker = new google.maps.Marker({
            position: new google.maps.LatLng(lat, lng),
            map: litemaps.maps[mapid],
        });     
        
        if (content) {
-         litemaps.markers[mapid][marker_id].infowindow = new google.maps.InfoWindow({
+         litemaps.markers[mapid][i].infowindow = new google.maps.InfoWindow({
            content: content
          });
          
-         google.maps.event.addListener(litemaps.markers[mapid][marker_id].marker, 'click', function() {
-           litemaps.markers[mapid][marker_id].infowindow.open(litemaps.maps[mapid], litemaps.markers[mapid][marker_id].marker);
+         google.maps.event.addListener(litemaps.markers[mapid][i].marker, 'click', function() {
+           litemaps.markers[mapid][marker_id].infowindow.open(litemaps.maps[mapid], litemaps.markers[mapid][i].marker);
          });
        }
        
-       return litemaps.markers[mapid][marker_id];
+       return litemaps.markers[mapid][i];
      },
      
      /**
@@ -198,7 +196,7 @@
        var mapid = e.data('mapid');
        if (! litemaps.limits[mapid]) {
          litemaps.limits[mapid] = new google.maps.LatLngBounds();
-         if (litemaps.markers[mapid]) {
+         if (litemaps.markers[mapid].length > 0) {
            $.each(litemaps.markers[mapid], function(marker_id, marker) {
              litemaps.limits[mapid].extend(marker.marker.getPosition());
            });
@@ -214,7 +212,7 @@
      setCenter: function(e) {
        var mapid = e.data('mapid');
        if (litemaps.options._center == 'auto') {
-         if (litemaps.markers[mapid]) {
+         if (litemaps.markers[mapid].length > 0) {
            litemaps.maps[mapid].setCenter(litemaps.getLimits(e).getCenter());
          }
        }
@@ -235,6 +233,7 @@
              var lng = 0;
            }
            
+           litemaps.options._center = {};
            litemaps.options._center.lat = lat;
            litemaps.options._center.lng = lng;
            litemaps.setCenter(e);
@@ -247,10 +246,14 @@
       * Set the center provided in options
       */
      setZoom: function(e) {
+       var mapid = e.data('mapid');
        if (litemaps.options._zoom == 'auto') {
-         if (litemaps.options.markers) {
-           litemaps.maps[e.data('mapid')].fitBounds(litemaps.getLimits(e));
+         if (litemaps.markers[mapid].length > 1) {
+           litemaps.maps[mapid].fitBounds(litemaps.getLimits(e));
          }
+       }
+       else {
+         litemaps.maps[mapid].setZoom(litemaps.options._zoom);
        }
      },
 
