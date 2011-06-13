@@ -138,9 +138,14 @@
          var markers = litemaps.options.markers;
          litemaps.markers = {};
          litemaps.markers[mapid] = new Array();
-         $.each(markers, function(marker_id, marker){ 
+         $.each(markers, function(marker_id, marker) { 
            if (marker.lat && marker.lng) {
              litemaps.addMarker(e, marker.lat, marker.lng, marker.content);
+           
+             // All markers has been added
+             if (litemaps.options.markers.length-1 == marker_id) {
+               litemaps.eventMarkersAdded(e);
+             }
            }
            else {
              var address = marker.address ? marker.address : marker;
@@ -148,7 +153,7 @@
              var callback = function(results, status) {
                if (status == google.maps.GeocoderStatus.OK) {
                  var position = results[0].geometry.location;
-                 litemaps.addMarker(e, marker_id, position.lat(), position.lng(), marker.content);
+                 litemaps.addMarker(e, position.lat(), position.lng(), marker.content);
                }
                
                // All markers has been added
@@ -165,9 +170,8 @@
      /**
       * Add marker into map
       */
-     addMarker: function(e, marker_id, lat, lng, content) {
+     addMarker: function(e, lat, lng, content) {
        var mapid = e.data('mapid');
-       var marker = litemaps.options.markers[marker_id];
        litemaps.markers[mapid].push({});
        var i = litemaps.markers[mapid].length - 1;
        
@@ -182,7 +186,7 @@
          });
          
          google.maps.event.addListener(litemaps.markers[mapid][i].marker, 'click', function() {
-           litemaps.markers[mapid][marker_id].infowindow.open(litemaps.maps[mapid], litemaps.markers[mapid][i].marker);
+           litemaps.markers[mapid][i].infowindow.open(litemaps.maps[mapid], litemaps.markers[mapid][i].marker);
          });
        }
        
@@ -212,7 +216,11 @@
      setCenter: function(e) {
        var mapid = e.data('mapid');
        if (litemaps.options._center == 'auto') {
-         if (litemaps.markers[mapid].length > 0) {
+         if (litemaps.markers[mapid].length == 1) {
+           var marker = litemaps.markers[mapid][0].marker;
+           litemaps.maps[mapid].setCenter(marker.getPosition());
+         }
+         else if (litemaps.markers[mapid].length > 1) {
            litemaps.maps[mapid].setCenter(litemaps.getLimits(e).getCenter());
          }
        }
