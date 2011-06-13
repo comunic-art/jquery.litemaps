@@ -141,29 +141,29 @@
          $.each(markers, function(marker_id, marker) { 
            if (marker.lat && marker.lng) {
              litemaps.addMarker(e, marker.lat, marker.lng, marker.content);
-           
-             // All markers has been added
-             if (litemaps.options.markers.length-1 == marker_id) {
-               litemaps.eventMarkersAdded(e);
-             }
            }
            else {
              var address = marker.address ? marker.address : marker;
-             var geocoder = litemaps.getGeocoder();
-             var callback = function(results, status) {
-               if (status == google.maps.GeocoderStatus.OK) {
-                 var position = results[0].geometry.location;
+             var callback = function(position, ok) {
+               if (ok) {
                  litemaps.addMarker(e, position.lat(), position.lng(), marker.content);
                }
                
-               // All markers has been added
-               if (litemaps.options.markers.length-1 == marker_id) {
+               // All markers has been added and no geocoder request is pending
+               if (! litemaps.geocodeIsPending() && markers.length == litemaps._markers) {
                  litemaps.eventMarkersAdded(e);
                }
              }
-             geocoder.geocode({address: address}, callback);
+
+             litemaps.geocode(address, callback);
            }
-         }); 
+           litemaps._markers++;
+         });
+         
+         // No geocoder request is pending
+         if (! litemaps.geocodeIsPending()) {
+           litemaps.eventMarkersAdded(e);
+         } 
        }
      },
      
@@ -192,6 +192,7 @@
        
        return litemaps.markers[mapid][i];
      },
+     _markers: 0,
      
      /**
       * Calculate the limits in order to set auto-zoom and auto-center
@@ -220,7 +221,7 @@
            var marker = litemaps.markers[mapid][0].marker;
            litemaps.maps[mapid].setCenter(marker.getPosition());
          }
-         else if (litemaps.markers[mapid].length > 1) {
+         else if (litemaps.markers[mapid].length > 0) {
            litemaps.maps[mapid].setCenter(litemaps.getLimits(e).getCenter());
          }
        }
@@ -229,10 +230,8 @@
        }
        else {
          var address = litemaps.options._center;
-         var geocoder = litemaps.getGeocoder();
-         var callback = function(results, status) {
-           if (status == google.maps.GeocoderStatus.OK) {
-             var position = results[0].geometry.location;
+         var callback = function(position, ok) {
+           if (ok) {
              var lat = position.lat();
              var lng = position.lng();
            }
@@ -246,7 +245,7 @@
            litemaps.options._center.lng = lng;
            litemaps.setCenter(e);
          }
-         geocoder.geocode({address: address}, callback);
+         litemaps.geocode(address, callback);
        }
      },
 
@@ -266,14 +265,35 @@
      },
 
      /**
-      * Create (if needed) and return instance of geocoder
+      * Geocode asyncroniously an address. Return google.maps.LatLng object.
       */
-     getGeocoder: function() {
+     geocode: function(address, callback) {       
        if (! litemaps._geocoder) {
          litemaps._geocoder = new google.maps.Geocoder();
        }
        
+       var _callback = function(results, status) {
+         litemaps._geocodeRequests--;
+         
+         var position;
+         var ok = false;
+         
+         if (status == google.maps.GeocoderStatus.OK) {
+           var position = results[0].geometry.location;
+           var ok = true;
+         }
+           
+         callback(position, ok);
+       }
+       
+       litemaps._geocodeRequests++;
+       litemaps._geocoder.geocode({address: address}, _callback);
+       
        return litemaps._geocoder;
+     },
+     _geocodeRequests: 0,
+     geocodeIsPending: function() {
+       return litemaps._geocodeRequests > 0;
      },
      
      /**
