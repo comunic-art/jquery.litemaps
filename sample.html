@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>jQuery LiteMaps sample page</title>
+    <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+    <script type="text/javascript" src="jquery.litemaps.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function(){
+        $('#map').litemaps({
+          width: '800px',
+          height: '600px',
+          markers:[
+            'Carrer Colon, Valencia, Spain',
+            {address: 'Avinguda Diagonal, Barcelona, Spain', content: 'This is the content of marker info window'},
+            {lat: 40.42052, lng: -3.70181}
+          ]
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <h1>jQuery LiteMaps</h1>
+    <a href="http://github.com/lesergi/jquery.litemaps">LiteMaps</a> is a <a href="http://jquery.com">jQuery</a> plugin for use <a href="http://maps.google.com">Google Maps</a> in a quick and easy way.
+      
+    <h2>Sample page</h2>
+    <div id="map"></div>
+    
+    <h3>Code</h3>
+<pre>
+  &lt;html&gt;
+    &lt;head&gt;
+      &lt;meta http-equiv=&quot;content-type&quot; content=&quot;text/html; charset=UTF-8&quot;&gt;
+      &lt;script type=&quot;text/javascript&quot; src=&quot;http://maps.google.com/maps/api/js?sensor=false&quot;&gt;&lt;/script&gt;
+      &lt;script type=&quot;text/javascript&quot; src=&quot;http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js&quot;&gt;&lt;/script&gt;
+      &lt;script type=&quot;text/javascript&quot; src=&quot;jquery.litemaps.js&quot;&gt;&lt;/script&gt;
+      &lt;script type=&quot;text/javascript&quot;&gt;
+        $(document).ready(function(){
+          $(&#x27;#map&#x27;).litemaps({
+            width: &#x27;800px&#x27;,
+            height: &#x27;600px&#x27;,
+            markers:[
+              &#x27;Carrer Colon, Valencia, Spain&#x27;,
+              {address: &#x27;Avinguda Diagonal, Barcelona, Spain&#x27;, content: &#x27;This is the content of marker info window&#x27;},
+              {lat: 40.42052, lng: -3.70181}
+            ]
+          });
+        });
+      &lt;/script&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+      &lt;div id=&quot;map&quot;&gt;&lt;/div&gt;
+    &lt;/body&gt;
+  &lt;/html&gt;
+</pre>
+  </body>
+</html>
