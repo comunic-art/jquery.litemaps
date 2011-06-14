@@ -1,7 +1,6 @@
 /*
  *  LiteMaps is a Google Maps Plugin for jQuery
- *  Version   : 0.1-alpha2
- *  Date      : 14 June, 2011
+ *  Version   : 0.1-alpha2-dev
  *  Licence   : GPL v3 : http://www.gnu.org/licenses/gpl.html  
  *  Author    : Sergio Jovani
  *  Contact   : lesergi@gmail.com
@@ -171,11 +170,11 @@
            }
            litemaps._markers++;
          });
-         
-         // No geocoder request is pending
-         if (! litemaps.geocodeIsPending()) {
-           litemaps.eventMarkersAdded(e);
-         } 
+       }
+       
+       // No geocoder request is pending
+       if (! litemaps.geocodeIsPending()) {
+         litemaps.eventMarkersAdded(e);
        }
      },
      
