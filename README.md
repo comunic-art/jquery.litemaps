@@ -41,13 +41,17 @@ Example:
 
 * **width**
 
-    The width of map. String with size in "px" or "%" is allowed.
+    The width of map. Integer (will be interpreted as "px"), string with size in "px" or "%" are allowed.
+    
+    **Note**: For static maps (see "staticmap" option below) only integer value is allowed.
 
     *Default: "800px"*
 
 * **height**
 
-    The height of map. String with size in "px" or "%" is allowed.
+    The height of map. Integer (will be interpreted as "px"), string with size in "px" or "%" are allowed.
+    
+    **Note**: For static maps (see "staticmap" option below) only integer value is allowed.
 
     *Default: "600px"*
 
@@ -68,6 +72,12 @@ Example:
     Map type string. Available options are: roadmap, satellite, hybrid, terrain.
 
     *Default: "roadmap"*
+    
+* **staticmap**
+
+    Show a map image using [Google Static Maps API](http://code.google.com/intl/es/apis/maps/documentation/staticmaps). Boolean values (true or false) are allowed.
+    
+    *Default: false*
 
 * **markers**
 

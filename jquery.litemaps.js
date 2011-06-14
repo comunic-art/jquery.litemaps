@@ -1,6 +1,7 @@
 /*
  *  LiteMaps is a Google Maps Plugin for jQuery
- *  Version   : 0.1-alpha1-dev
+ *  Version   : 0.1-alpha2
+ *  Date      : 14 June, 2011
  *  Licence   : GPL v3 : http://www.gnu.org/licenses/gpl.html  
  *  Author    : Sergio Jovani
  *  Contact   : lesergi@gmail.com
@@ -59,6 +60,11 @@
      init: function(e) {
        litemaps.setSize(e, litemaps.options.width, litemaps.options.height);
        e.data('mapid', litemaps.mapid++);
+       
+       if (litemaps.options.staticmap) {
+         return litemaps.staticmap(e);
+       }
+       
        litemaps.maps[e.data('mapid')] = new google.maps.Map(e.get(0), litemaps.options);
        litemaps.setMarkers(e);
      },
@@ -74,6 +80,7 @@
          markers: new Array(),
          height: '600px',
          width: '800px',
+         staticmap: false
        };
      },
      
@@ -97,6 +104,11 @@
          }
        });
        
+       // Static
+       if (litemaps.options.staticmap) {
+         return;
+       }
+       
        // Zoom
        litemaps.options._zoom = litemaps.options.zoom;
        litemaps.options.zoom = 15;
@@ -113,8 +125,8 @@
       * Set size of container
       */
      setSize: function(e) {
-       e.css('width', litemaps.options.width);
-       e.css('height', litemaps.options.height);
+       e.width(litemaps.options.width);
+       e.height(litemaps.options.height);
      },
      
      /**
@@ -303,6 +315,71 @@
        litemaps.setCenter(e);
        litemaps.setZoom(e);
      },
+     
+     /**
+      * Static Maps function. Insert a static map into element.
+      */
+     staticmap: function(e) {
+       var url = "http://maps.google.com/maps/api/staticmap";
+       var query = ['sensor=false'];
+       
+       // Size
+       query.push('size=' + litemaps.options.width + 'x' + litemaps.options.height);
+       
+       // Type
+       query.push('maptype=' + litemaps.options.type);
+       
+       // Markers
+       var markers = new Array();
+       $.each(litemaps.options.markers, function(marker_id, marker) {
+         if (marker.lat && marker.lng) {
+           markers.push(marker.lat + "," + marker.lng);
+         }
+         else if (marker.address) {
+           markers.push(marker.address);
+         }
+         else {
+           markers.push(marker);
+         }
+       });
+       
+       if (markers.length > 0) {
+         markers = markers.join('|');
+         query.push('markers=' + markers);
+       }
+       
+       // Center
+       if (litemaps.options.center != 'auto') {
+         if (litemaps.options.center.lat && litemaps.options.center.lng) {
+           query.push('center=' + litemaps.options.center.lat + ',' + litemaps.options.center.lng);
+         }
+         else {
+           query.push('center=' + litemaps.options.center);
+         }
+       }
+       
+       // Zoom
+       if (litemaps.options.zoom != 'auto') {
+         query.push('zoom=' + litemaps.options.zoom);
+       }
+       
+       $.each(litemaps.options, function(option_id, option) {
+         switch(option_id) {
+           case 'markers':
+             
+             break;
+             
+           case 'height':
+         }
+       });
+       
+       url = url + "?" + query.join('&');
+       var html = '<img src="' + url + '" alt="jQuery LiteMaps (http://github.com/lesergi/jquery.litemaps)" />';
+       
+       litemaps.maps[e.data('mapid')] = html;
+       e.html(html);
+     }
+     
    };
 
    $.fn.litemaps = function() {
