@@ -39,11 +39,6 @@
    var litemaps = {
      
      /**
-      * Map list
-      */
-     maps: {},
-     
-     /**
       * Incrementable ID for maps
       */
      mapid: 0,
@@ -58,13 +53,14 @@
       */
      init: function(e) {
        litemaps.setSize(e, litemaps.options.width, litemaps.options.height);
-       e.data('mapid', litemaps.mapid++);
+       litemaps.setMapId(e);
        
        if (litemaps.options.staticmap) {
          return litemaps.staticmap(e);
        }
        
-       litemaps.maps[e.data('mapid')] = new google.maps.Map(e.get(0), litemaps.options);
+       var map = new google.maps.Map(e.get(0), litemaps.options);
+       litemaps.setMap(e, map);
        litemaps.setMarkers(e);
      },
      
@@ -145,7 +141,7 @@
       */
      setMarkers: function(e) {
        if (litemaps.options.markers.length > 0) {
-         var mapid = e.data('mapid');
+         var mapid = litemaps.getMapId(e);
          var markers = litemaps.options.markers;
          litemaps.markers = {};
          litemaps.markers[mapid] = new Array();
@@ -182,13 +178,13 @@
       * Add marker into map
       */
      addMarker: function(e, lat, lng, content) {
-       var mapid = e.data('mapid');
+       var mapid = litemaps.getMapId(e);
        litemaps.markers[mapid].push({});
        var i = litemaps.markers[mapid].length - 1;
        
        litemaps.markers[mapid][i].marker = new google.maps.Marker({
            position: new google.maps.LatLng(lat, lng),
-           map: litemaps.maps[mapid],
+           map: litemaps.getMap(e),
        });     
        
        if (content) {
@@ -197,7 +193,7 @@
          });
          
          google.maps.event.addListener(litemaps.markers[mapid][i].marker, 'click', function() {
-           litemaps.markers[mapid][i].infowindow.open(litemaps.maps[mapid], litemaps.markers[mapid][i].marker);
+           litemaps.markers[mapid][i].infowindow.open(litemaps.getMap(e), litemaps.markers[mapid][i].marker);
          });
        }
        
@@ -209,7 +205,7 @@
       * Calculate the limits in order to set auto-zoom and auto-center
       */
      getLimits: function(e) {
-       var mapid = e.data('mapid');
+       var mapid = litemaps.getMapId(e);
        if (! litemaps.limits[mapid]) {
          litemaps.limits[mapid] = new google.maps.LatLngBounds();
          if (litemaps.markers[mapid].length > 0) {
@@ -226,18 +222,18 @@
       * Set the center provided in options
       */
      setCenter: function(e) {
-       var mapid = e.data('mapid');
+       var mapid = litemaps.getMapId(e);
        if (litemaps.options._center == 'auto') {
          if (litemaps.markers[mapid].length == 1) {
            var marker = litemaps.markers[mapid][0].marker;
-           litemaps.maps[mapid].setCenter(marker.getPosition());
+           litemaps.getMap(e).setCenter(marker.getPosition());
          }
          else if (litemaps.markers[mapid].length > 0) {
-           litemaps.maps[mapid].setCenter(litemaps.getLimits(e).getCenter());
+           litemaps.getMap(e).setCenter(litemaps.getLimits(e).getCenter());
          }
        }
        else if (litemaps.options._center.lat && litemaps.options._center.lng) {
-         litemaps.maps[mapid].setCenter(new google.maps.LatLng(litemaps.options._center.lat, litemaps.options._center.lng));
+         litemaps.getMap(e).setCenter(new google.maps.LatLng(litemaps.options._center.lat, litemaps.options._center.lng));
        }
        else {
          var address = litemaps.options._center;
@@ -264,14 +260,14 @@
       * Set the center provided in options
       */
      setZoom: function(e) {
-       var mapid = e.data('mapid');
+       var mapid = litemaps.getMapId(e);
        if (litemaps.options._zoom == 'auto') {
          if (litemaps.markers[mapid].length > 1) {
-           litemaps.maps[mapid].fitBounds(litemaps.getLimits(e));
+           litemaps.getMap(e).fitBounds(litemaps.getLimits(e));
          }
        }
        else {
-         litemaps.maps[mapid].setZoom(litemaps.options._zoom);
+         litemaps.getMap(e).setZoom(litemaps.options._zoom);
        }
      },
 
@@ -375,10 +371,25 @@
        url = url + "?" + query.join('&');
        var html = '<img src="' + url + '" alt="jQuery LiteMaps (http://github.com/lesergi/jquery.litemaps)" />';
        
-       litemaps.maps[e.data('mapid')] = html;
+       litemaps.setMap(e, html);
        e.html(html);
-     }
+     },
      
+     setMap: function(e, map) {
+       e.data('litemaps_map', map);
+     },
+     
+     getMap: function(e) {
+       return e.data('litemaps_map');
+     },
+     
+     setMapId: function(e) {
+       e.data('litemaps_id', litemaps.mapid++);
+     },
+     
+     getMapId: function(e) {
+       return e.data('litemaps_id');
+     }     
    };
 
    $.fn.litemaps = function() {
