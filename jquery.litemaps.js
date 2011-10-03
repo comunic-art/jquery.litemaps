@@ -184,7 +184,7 @@
        
        litemaps.markers[mapid][i].marker = new google.maps.Marker({
            position: new google.maps.LatLng(lat, lng),
-           map: litemaps.getMap(e),
+           map: litemaps.getMap(e)
        });     
        
        if (content) {
