@@ -120,6 +120,15 @@
       * Set size of container
       */
      setSize: function(e) {
+       // Typecasting
+       var intRegex = /^\d+$/;
+       if (intRegex.test(litemaps.options.width)) {
+        litemaps.options.width = parseInt(litemaps.options.width, 10);
+       }
+       if (intRegex.test(litemaps.options.height)) {
+         litemaps.options.height = parseInt(litemaps.options.height, 10);
+       }
+
        e.width(litemaps.options.width);
        e.height(litemaps.options.height);
      },
