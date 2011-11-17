@@ -276,7 +276,7 @@
          }
        }
        else {
-         litemaps.getMap(e).setZoom(litemaps.options._zoom);
+         litemaps.getMap(e).setZoom(parseInt(litemaps.options._zoom, 10));
        }
      },
 
