@@ -1,6 +1,5 @@
 /*
  *  LiteMaps is a Google Maps Plugin for jQuery
- *  Version   : 0.1
  *  Licence   : GPL v3 : http://www.gnu.org/licenses/gpl.html  
  *  Author    : Sergio Jovani
  *  Contact   : lesergi@gmail.com
@@ -149,11 +148,12 @@
       * Add markers to the map
       */
      setMarkers: function(e) {
+       var mapid = litemaps.getMapId(e);
+       litemaps.markers = {};
+       litemaps.markers[mapid] = new Array();
+       
        if (litemaps.options.markers.length > 0) {
-         var mapid = litemaps.getMapId(e);
          var markers = litemaps.options.markers;
-         litemaps.markers = {};
-         litemaps.markers[mapid] = new Array();
          $.each(markers, function(marker_id, marker) { 
            if (marker.lat && marker.lng) {
              litemaps.addMarker(e, marker.lat, marker.lng, marker.content);
@@ -240,6 +240,19 @@
          else if (litemaps.markers[mapid].length > 0) {
            litemaps.getMap(e).setCenter(litemaps.getLimits(e).getCenter());
          }
+         else {
+           $.getScript('http://www.google.com/jsapi', function() {
+             var geocoder = new google.maps.Geocoder();
+             if(google.loader.ClientLocation) {
+               loc = {};
+               loc.lat = google.loader.ClientLocation.latitude;
+               loc.lng = google.loader.ClientLocation.longitude;
+
+               var latlng = new google.maps.LatLng(loc.lat, loc.lng);
+               litemaps.getMap(e).setCenter(latlng);
+             }
+           });
+         }
        }
        else if (litemaps.options._center.lat && litemaps.options._center.lng) {
          litemaps.getMap(e).setCenter(new google.maps.LatLng(litemaps.options._center.lat, litemaps.options._center.lng));
@@ -273,6 +286,10 @@
        if (litemaps.options._zoom == 'auto') {
          if (litemaps.markers[mapid].length > 1) {
            litemaps.getMap(e).fitBounds(litemaps.getLimits(e));
+         }
+         else {
+           // Why 5? Cause is country-level zoom
+           litemaps.getMap(e).setZoom(5);
          }
        }
        else {
