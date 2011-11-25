@@ -1,6 +1,6 @@
 /*
  *  LiteMaps is a Google Maps Plugin for jQuery
- *  Version   : 0.1-alpha2-dev
+ *  Version   : 0.1
  *  Licence   : GPL v3 : http://www.gnu.org/licenses/gpl.html  
  *  Author    : Sergio Jovani
  *  Contact   : lesergi@gmail.com
