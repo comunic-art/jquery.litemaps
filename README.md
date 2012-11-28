@@ -31,7 +31,7 @@ Example:
           markers:[
             'Colon, Valencia, Spain',
             {address: 'Avinguda Diagonal, Barcelona, Spain', content: 'This is the content of marker info window'},
-            {lat: 40.42052, lng: -3.70181}
+            {lat: 40.42052, lng: -3.70181, icon: 'http://chart.apis.google.com/chart?chst=d_map_pin_icon&chld=cafe'}
           ]
         });
       });
@@ -81,6 +81,6 @@ Example:
 
 * **markers**
 
-    An array with the markers. Address string, `{address: string, content: string}` or `{lat: float, lng: float, content: string}` are allowed.
+    An array with the markers. Address string, `{address: string, content: string, icon: string}` or `{lat: float, lng: float, content: string, icon: string}` are allowed.
     
     *Default: Array()*

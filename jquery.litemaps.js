@@ -157,13 +157,13 @@
          var markers = litemaps.options.markers;
          $.each(markers, function(marker_id, marker) { 
            if (marker.lat && marker.lng) {
-             litemaps.addMarker(e, marker.lat, marker.lng, marker.content);
+             litemaps.addMarker(e, marker.lat, marker.lng, marker.content, marker.icon);
            }
            else {
              var address = marker.address ? marker.address : marker;
              var callback = function(position, ok) {
                if (ok) {
-                 litemaps.addMarker(e, position.lat(), position.lng(), marker.content);
+                 litemaps.addMarker(e, position.lat(), position.lng(), marker.content, marker.icon);
                }
                
                // All markers has been added and no geocoder request is pending
@@ -187,15 +187,21 @@
      /**
       * Add marker into map
       */
-     addMarker: function(e, lat, lng, content) {
+     addMarker: function(e, lat, lng, content, icon) {
        var mapid = litemaps.getMapId(e);
        litemaps.markers[mapid].push({});
        var i = litemaps.markers[mapid].length - 1;
        
-       litemaps.markers[mapid][i].marker = new google.maps.Marker({
+       var marker = {
            position: new google.maps.LatLng(lat, lng),
            map: litemaps.getMap(e)
-       });     
+       };
+       
+       if (icon) {
+         marker.icon = icon;
+       }
+       
+       litemaps.markers[mapid][i].marker = new google.maps.Marker(marker);     
        
        if (content) {
          litemaps.markers[mapid][i].infowindow = new google.maps.InfoWindow({
@@ -354,19 +360,25 @@
        // Markers
        var markers = new Array();
        $.each(litemaps.options.markers, function(marker_id, marker) {
+         var icon = '';
+         
+         if (marker.icon) {
+           icon = 'icon:' + encodeURIComponent(marker.icon) + '|';
+         }
+         
          if (marker.lat && marker.lng) {
-           markers.push(marker.lat + "," + marker.lng);
+           markers.push(icon + marker.lat + "," + marker.lng);
          }
          else if (marker.address) {
-           markers.push(marker.address);
+           markers.push(icon + marker.address);
          }
          else {
-           markers.push(marker);
+           markers.push(icon + marker);
          }
        });
        
        if (markers.length > 0) {
-         markers = markers.join('|');
+         markers = markers.join('&markers=');
          query.push('markers=' + markers);
        }
        
